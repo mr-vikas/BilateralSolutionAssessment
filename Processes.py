@@ -9,6 +9,13 @@ Write a code that picks file from in-que folder and updates a column in MySQL/m
 Also, make sure no files moved from Processing to in-que until in-que folder is empty
 This means even if in-que folder have even 1 file no new file to be copied from the Processing folder and the in-que folder to be empty to to move files from the processing folder
 '''
+''' I Solved This problem using multi-threading, Because i think this is the best solution for solve this type of problems  '''
+
+'''
+Folder names:
+    Processing , in-que , Processed     
+'''
+
 
 from time import sleep
 from threading import *
@@ -16,17 +23,8 @@ import shutil
 import os
 import mysql.connector as con
 
-''' I Solved This problem using multi-threading, Because i think this is the best solution for solve this type of problems  '''
 
-'''
-Folder names:
-    Processing , in-que , Processed
-        
-'''
-
-
-
-'''Processing Class is responsible to create file on every second'''
+'''Processing Class - to create file on every second'''
 class Processing(Thread):
     def run(self):
         Processing_counter = 1
@@ -35,7 +33,7 @@ class Processing(Thread):
             Processing_counter += 1
             sleep(1)
 
-'''In-que Class is responsible to move file from Processing to in-que when que is Empty'''
+'''In-que Class - to move file from Processing to in-que when que is Empty'''
 class In_que(Thread):
     def run(self):
         src = 'Processing'
@@ -48,7 +46,7 @@ class In_que(Thread):
                     file_name = os.path.join(src, file)
                     shutil.move(file_name, dest)
 
-'''Processed Class is responsible to move file from que to Processed and update the column of mysql '''
+'''Processed Class - to move file from que to Processed and update the column of mysql '''
 class Processed(Thread):
     def run(self):
         mydb = con.connect(host="localhost", user="root", passwd="", database="bilateralassessment")
@@ -70,6 +68,7 @@ class Processed(Thread):
 Processing_thread = Processing()
 Queue_thread = In_que()
 Processed_thread = Processed()
+
 '''Start the Thread'''
 Processing_thread.start()
 Queue_thread.start()
